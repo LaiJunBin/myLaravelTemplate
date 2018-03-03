@@ -28,4 +28,7 @@ Route::group(['prefix' => 'user'],function(){
     Route::post('/sign-up','UserController@signUpProcess')->middleware(['user.sign.up']);
     //註冊驗證
     Route::get('/verification/{user}/{code}','RegisterUserController@verification');
+    //登出處理
+    Route::get('/sign-out','UserController@signOut');
+
 });
