@@ -3,9 +3,15 @@
 @section('brandName','MyHome') 
 
 @section('navMenu')
-    @foreach ( $navMenu as $item)
-        <li><a href="{{url($item['url'])}}">{{$item['title']}}</a></li>
-    @endforeach
+    @if (session()->has('user_name'))
+        @section('navbarAlign','right')
+        <li><a href="{{url('user/sign-out')}}">登出</a></li>
+    @else
+        @foreach ( $navMenu as $item)
+            <li><a href="{{url($item['url'])}}">{{$item['title']}}</a></li>
+        @endforeach
+    @endif
+    
 @endsection
 
 @section('breadcrumb')
