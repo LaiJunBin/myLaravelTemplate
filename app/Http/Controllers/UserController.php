@@ -8,20 +8,31 @@ use App\RegisterUser;
 Use App\User;
 use Hash;
 Use App\Jobs\SendSignUpMailJob;
-
+use Illuminate\Support\Facades\Route;
 
 class UserController extends Controller
 {
     public function index(){
-        $binding = [
-            'navMenu' => [
-                ['url'=>'user/sign-in','title'=>'登入'],
-                ['url'=>'user/sign-up','title'=>'註冊']
-            ],
-            'breadcrumb' =>[
-                'MyHome'
-            ]
-        ];
+        $binding = [];
+        if(session()->has('user_name')){
+            $binding = [
+                'breadcrumb' => ['MyHome'],
+                'navMenu' => [
+                    ['url'=>'user/update-password','title'=>'修改密碼'],
+                    'divider',
+                    ['url'=>'user/sign-out','title'=>'登出'],
+                ],
+                'user_name' => '使用者：'.session('user_name')
+            ];
+        }else{
+            $binding = [
+                'breadcrumb' => ['MyHome'],
+                'navMenu' => [
+                    ['url'=>'user/sign-in','title'=>'登入'],
+                    ['url'=>'user/sign-up','title'=>'註冊']
+                ]
+            ];
+        }
         return view('user.index',$binding);
     }
     public function signUp(){
@@ -145,6 +156,65 @@ class UserController extends Controller
         session()->forget('user_name');
         session()->forget('user_email');
         return redirect('user');
+    }
+
+    public function updatePassword(){
+        $binding = [
+            'navMenu' => [
+                ['url'=>'user/update-password','title'=>'修改密碼'],
+                'divider',
+                ['url'=>'user/sign-out','title'=>'登出'],
+            ],
+            'user_name' => '使用者：'.session('user_name'),
+            'breadcrumb' =>[
+                ['url'=>'user','title'=>'MyHome'],
+                '修改密碼'
+            ]
+        ];
+        //取得當前路由
+        // $currentPath= Route::getFacadeRoot()->current()->uri();
+
+        return view('user.updatePassword',$binding);
+    }
+
+    public function updatePasswordProcess(){
+        $input = request()->all();
+        
+        $rules = [
+            'old_password'=>[
+                'required',
+                'min:6',
+                'max:191'
+            ],
+            'password'=>[
+                'required',
+                'min:6',
+                'max:191',
+                'same:password_confirmation',
+            ],
+            'password_confirmation'=>[
+                'required',
+                'min:6',
+                'max:191'
+            ],
+        ];
+        
+        $validator = Validator::make($input,$rules);
+        if($validator->fails()){
+            return redirect('/user/update-password')->withErrors($validator);
+        }
+        $user_email = session('user_email');
+        $old_password = $input['old_password'];
+        $user = User::where('email',$user_email)->first();
+        $is_password_correct = Hash::check($old_password,$user->password);
+        if($is_password_correct){
+            $user->update([
+                'password'=>Hash::make($input['password'])
+            ]);
+        }else{
+            return redirect('user/update-password')->withErrors('舊密碼錯誤!');
+        }
+        return redirect('user/')->with('updatePasswordSuccess','OK');
     }
 
 }

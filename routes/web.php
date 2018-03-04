@@ -30,5 +30,8 @@ Route::group(['prefix' => 'user'],function(){
     Route::get('/verification/{user}/{code}','RegisterUserController@verification');
     //登出處理
     Route::get('/sign-out','UserController@signOut');
-
+    //更改密碼的介面
+    Route::get('update-password','UserController@updatePassword')->middleware(['user.auth']);
+    //更改密碼的處理
+    Route::put('/update-password','UserController@updatePasswordProcess');
 });

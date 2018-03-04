@@ -2,17 +2,31 @@
 @section('brandUrl',url('user'))
 @section('brandName','MyHome') 
 
-@section('navMenu')
+
     @if (session()->has('user_name'))
-        @section('navbarAlign','right')
-        <li><a href="{{url('user/sign-out')}}">登出</a></li>
+        @section('dropdownHeader')
+            {{ $user_name }}
+            <span class="caret"></span>
+        @endsection
+        
+        @section('dropdownItems')
+            @foreach ( $navMenu as $item)
+                @if ($item == 'divider')
+                    <li class="divider"></li>
+                @else
+                    <li><a href="{{url($item['url'])}}">{{$item['title']}}</a></li>
+                @endif
+            @endforeach
+        @endsection
     @else
-        @foreach ( $navMenu as $item)
-            <li><a href="{{url($item['url'])}}">{{$item['title']}}</a></li>
-        @endforeach
+        @section('navMenu')
+            @foreach ( $navMenu as $item)
+                <li><a href="{{url($item['url'])}}">{{$item['title']}}</a></li>
+            @endforeach
+        @endsection
     @endif
     
-@endsection
+
 
 @section('breadcrumb')
     @foreach ($breadcrumb as $item)

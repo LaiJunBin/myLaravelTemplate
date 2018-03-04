@@ -9,6 +9,9 @@
     @elseif(session()->has('registerUserSuccess'))
         @include('components.registerUserSuccess')
         {{session()->forget('registerUserSuccess')}}
+    @elseif(session()->has('updatePasswordSuccess'))
+        @include('components.updatePasswordSuccess')
+        {{session()->forget('updatePasswordSuccess')}}
     @endif
 @endsection
 
